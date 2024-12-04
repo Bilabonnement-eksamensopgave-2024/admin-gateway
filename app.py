@@ -1,55 +1,77 @@
 from flask import Flask, jsonify, request, make_response
 import requests
-import sqlite3
-import bcrypt
 import os
-import jwt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flasgger import swag_from
-import datetime
+from dotenv import load_dotenv
+import threading
+import time
 from swagger.config import init_swagger
-import user
-import auth
+
 
 app = Flask(__name__)
 
 # Configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
+# Load environment variables from .env file
+load_dotenv()
+
 # MICROSERVICES:
 MICROSERVICES = {
-    "room_inventory_service": os.getenv("ROOM_INVENTORY_SERVICE_URL", "http://localhost:5002"),
-    "reservation_service": os.getenv("RESERVATION_SERVICE_URL", "http://localhost:5003"),
-    "csv_export_service": os.getenv("CSV_EXPORT_SERVICE_URL", "http://localhost:5005"),
-    "drinks_service": os.getenv("DRINKS_SERVICE_URL", "http://localhost:5004"),
-    "drinks_sales_service": os.getenv("DRINKS_SALES_SERVICE_URL", "http://localhost:5006"),
-    "guest_service": os.getenv("GUEST_SERVICE_URL", "http://localhost:5001"),
+    "abonnement_microservice": os.getenv("ABONNEMENT_MICROSERVICE_URL", "http://localhost:5002"),
+    "login_microservice": os.getenv("LOGIN_MICROSERVICE_URL", "http://localhost:5003"),
 }
+
+ENDPOINTS = {} 
 
 # Initialize Swagger
 init_swagger(app)
 
-# ----------------------------------------------------- ENDPOINTS
-@app.route('/<service>/<path:path>', methods=['GET', 'POST', 'PATCH', 'DELETE'])
-def gateway(service, path):
-    if service not in MICROSERVICES:
-        return jsonify({"error": "Service not found"}), 404
+def update_endpoints():
+    while True:
+        for service, url in MICROSERVICES.items(): 
+            try: 
+                response = requests.get(f"{url}/routes") 
+                routes = response.json() 
+                for route in routes: 
+                    for method in route["methods"]:
+                        key = f"{method}_{route['path'].strip('/')}"
+                        ENDPOINTS[key] = f"{url}{route['path']}"
+            except requests.exceptions.ConnectionError as e: 
+                print(f"Connection error for {service}: {e}") 
+            except Exception as e: 
+                print(f"Error updating routes for {service}: {e}") 
+                time.sleep(60*5) # Update every 60 seconds 
 
-    # Get the full URL for the microservice
-    url = f"{MICROSERVICES[service]}/{path}"
+threading.Thread(target=update_endpoints, daemon=True).start() 
+
+# ----------------------------------------------------- ENDPOINTS
+@app.route('/<path:path>', methods=['GET', 'POST', 'PATCH', 'DELETE']) 
+def gateway(path): 
+    key = f"{request.method}_{path}" 
+    if key not in ENDPOINTS: 
+        return jsonify({"error": "Endpoint not found"}), 404 
+    
+    # Get the full URL for the specific endpoint 
+    url = ENDPOINTS[key]
+
+    #headers = {key: value for key, value in request.headers.items()} 
+    
+    #print(f"Headers for {request.method} request: {headers}")
 
     # Forward request with appropriate HTTP method
-    response = requests.request(
-        method=request.method,
-        url=url,
-        headers={key: value for key, value in request.headers},
-        data=request.get_data(),
-        cookies=request.cookies,
-        allow_redirects=False
+    response = requests.request( 
+        method=request.method, 
+        url=url, 
+        headers={"Authorization": "Bearer 1234"},
+        params=request.args, 
+        data=request.get_data(), 
+        allow_redirects=False 
     )
-
+    
     # Pass response back to client
-    return (response.content, response.status_code, response.headers.items())
+    return response.content, response.status_code, response.headers.items()
 
 # ----------------------------------------------------- GET /health
 @app.route('/health', methods=['GET'])
