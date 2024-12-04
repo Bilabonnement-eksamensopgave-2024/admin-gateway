@@ -12,7 +12,7 @@ from swagger.config import init_swagger
 app = Flask(__name__)
 
 # Configuration
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+#app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # Load environment variables from .env file
 load_dotenv()
@@ -55,6 +55,8 @@ def gateway(path):
     
     # Get the full URL for the specific endpoint 
     url = ENDPOINTS[key]
+
+    print(url)
 
     #headers = {key: value for key, value in request.headers.items()} 
     
