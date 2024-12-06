@@ -1,4 +1,3 @@
-
 from flasgger import Swagger
 
 # Swagger configuration
@@ -20,20 +19,30 @@ swagger_config = {
 ##UPDATE##
 template = {
     "info": {
-        "title": "GitHub Stats API Gateway",
-        "description": "API Gateway for managing GitHub statistics and user authentication",
+        "title": "Admin gateway",
+        "description": "This gateway has access to all microservices in the system.",
         "version": "1.0.0",
-        "contact": {
-            "name": "KEA",
-            "url": "https://kea.dk"
-        }
     },
     "securityDefinitions": {
-        "Bearer": {
+        "cookieAuth": {
             "type": "apiKey",
             "name": "Authorization",
-            "in": "header",
-            "description": "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
+            "in": "cookie",
+            "description": "JWT Authorization cookie with required roles. Example: \"Authorization: Bearer {token}\""
+        }
+    },
+    "security": [
+        {
+            "cookieAuth": []
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "cookieAuth": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "cookie"
+            }
         }
     }
 }

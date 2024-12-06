@@ -1,0 +1,64 @@
+tags:
+  - name: Users
+summary: User login
+description: Authenticate a user and return a JWT token. Must include "email" and "password".
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        password:
+            type: string
+            example: "secure_password123"
+        email:
+          type: string
+          example: "john_doe@mail.com"
+responses:
+  200:
+    description: Login successful
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Login successful"
+            Authorization:
+              type: string
+              example: "Bearer <JWT token>"
+  400:
+    description: Missing email or password
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "Missing email or password"
+  401:
+    description: Invalid email or password
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "Invalid email or password"
+  500:
+    description: Internal server error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "An unexpected error occurred"
