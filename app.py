@@ -23,7 +23,7 @@ MICROSERVICES = {
 init_swagger(app)
 
 # ----------------------------------------------------- ENDPOINTS /service/path
-@app.route('/<service>/<path:path>', methods=['GET', 'PATCH', 'DELETE'])
+@app.route('/<service>/<path:path>', methods=['GET', 'POST', 'PATCH', 'DELETE'])
 def gateway_service(service, path):
     if service not in MICROSERVICES:
         return jsonify({"error": "Service not found"}), 404
