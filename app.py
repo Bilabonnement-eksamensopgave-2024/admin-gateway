@@ -15,6 +15,8 @@ load_dotenv()
 MICROSERVICES = {
     "abonnement": os.getenv("ABONNEMENT_MICROSERVICE_URL", "http://localhost:5002"),
     "user": os.getenv("USER_MICROSERVICE_URL", "http://localhost:5005"),
+    "skade": os.getenv("SKADE_MICROSERVICE_URL", "http://localhost:5006"),
+    "car": os.getenv("CAR_MICROSERVICE_URL", "http://localhost:5007"),
 }
 
 # Initialize Swagger
