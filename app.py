@@ -13,9 +13,9 @@ load_dotenv()
 
 # MICROSERVICES:
 MICROSERVICES = {
-    "abonnement": os.getenv("ABONNEMENT_MICROSERVICE_URL", "http://localhost:5006"),
+    "subscription": os.getenv("ABONNEMENT_MICROSERVICE_URL", "http://localhost:5006"),
     "user": os.getenv("USER_MICROSERVICE_URL", "http://localhost:5005"),
-    "skade": os.getenv("SKADE_MICROSERVICE_URL", "http://localhost:5007"),
+    "damage": os.getenv("SKADE_MICROSERVICE_URL", "http://localhost:5007"),
     "car": os.getenv("CAR_MICROSERVICE_URL", "http://localhost:5008"),
 }
 
