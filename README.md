@@ -76,8 +76,8 @@ If the requested service is not found in the configuration, it returns a 404 err
 ## Endpoints
 
 ### Base URL
-- Local: `http://localhost:5000`
-- Production (Azure): `<Azure App URL>`
+- Local: http://localhost:5000
+- Production (Azure): https://admin-gateway-fqevcraygyfvafe2.northeurope-01.azurewebsites.net
 
 ### Endpoint Documentation
 
